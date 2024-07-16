@@ -1,3 +1,36 @@
+
+type OrderType = {
+  id:string
+  customerClerkId:string,
+  shippingRate: string,
+  totalAmount: number,
+  createdAt: Date,
+  updatedAt: Date,
+  customerId:string,
+  customer:CustomerType;
+  shippingAddress:ShippingAddressType;
+  products:ProductType[];
+}
+
+type CustomerType={
+  id:string,
+  name:string,
+  email:string,
+  createdAt:Date,
+  updatedAt:Date
+}
+
+type ShippingAddressType= {
+  id:string,
+  streetNumber:string,
+  streetName:string,
+  city:string,
+  state:string,
+  postalCode:number,
+  country:string,
+  orderId:string
+}
+
 type CollectionType = {
   id: string;
   title: string;
@@ -17,6 +50,8 @@ export type ProductType = {
   sizes: string;
   colors: string;
   price: number;
+  productId?:string;
+  orderId?:string;
   expense: number;
   createdAt: Date;
   updatedAt: Date;
