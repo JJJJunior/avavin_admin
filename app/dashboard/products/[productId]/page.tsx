@@ -1,9 +1,8 @@
 'use client'
 import React, {useEffect, useState} from 'react';
-import {CollectionType, ProductType} from "@/lib/types";
+import {ProductType} from "@/lib/types";
 import axios from "axios";
 import Loader from "@/components/custom ui/Loader";
-import CollectionForm from "@/components/collections/CollectionForm";
 import ProductForm from "@/components/products/ProductForm";
 
 const ProductDetails = ({params}: { params: { productId: string } }) => {

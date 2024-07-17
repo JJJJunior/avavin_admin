@@ -5,7 +5,7 @@ import {DataTable} from "@/components/custom ui/DataTable";
 import {columns} from "@/components/orders/OrderColumns"
 
 const OrdersPage = async () => {
-    const res = await axios.get('http://localhost:3000/api/orders')
+    const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/orders`)
     const orders = res.data
     return (
         <div className="px-10 py-5">
