@@ -8,14 +8,13 @@ import { Separator } from "@/components/ui/separator";
 import { DataTable } from "@/components/custom ui/DataTable";
 import { columns } from "@/components/products/ProductColumns";
 import { useRouter } from "next/navigation";
-import { ProductType } from "@/lib/types";
 
 const ProductsPage = () => {
   const [loading, setLoading] = React.useState(false);
-  const [products, setProducts] = React.useState<ProductType[]>([]);
+  const [products, setProducts] = React.useState<[]>([]);
   const router = useRouter();
 
-  const getProducts = async (): Promise<ProductType[]> => {
+  const getProducts = async ()=> {
     setLoading(true);
     try {
       const res = await axios.get("/api/products");
@@ -47,7 +46,7 @@ const ProductsPage = () => {
         </Button>
       </div>
       <Separator className="bg-grey-1 my-4" />
-      <DataTable columns={columns} data={products} searchKey="title" />
+      <DataTable columns={columns} data={products} searchKey="title"/>
     </div>
   );
 };

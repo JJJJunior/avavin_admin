@@ -4,7 +4,6 @@ import { ColumnDef } from "@tanstack/react-table";
 import Delete from "@/components/custom ui/Delete";
 import Link from "next/link";
 import { ProductType } from "@/lib/types";
-import prisma from "@/prisma";
 
 export const columns: ColumnDef<ProductType>[] = [
   {
