@@ -43,7 +43,7 @@ const AvaImageServerUpload: React.FC<AvaImageServerUploadProps> = ({onUpload}) =
             ...item,
             savedUrl,
         }))
-        if (newData) {
+        if (newData.length>0) {
             try {
                 const res = await axios.post("/api/images", newData)
                 if (res.status === 200) {
@@ -55,7 +55,7 @@ const AvaImageServerUpload: React.FC<AvaImageServerUploadProps> = ({onUpload}) =
                 setFileList([])
             }
         } else {
-            console.log("newData is null")
+            // console.log("newData is null")
         }
     }
     const handleClickCancel = () => {

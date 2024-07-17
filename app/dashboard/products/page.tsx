@@ -32,7 +32,7 @@ const ProductsPage = () => {
     getProducts();
   }, []);
 
-  console.log(products);
+  // console.log(products);
 
   return loading ? (
     <Loader />
