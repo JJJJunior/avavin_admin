@@ -32,7 +32,7 @@ export const DELETE = async (req: NextRequest, { params }: { params: { productId
       });
     }
 
-    await prisma.collection.delete({
+    await prisma.product.delete({
       where: {
         id: params.productId,
       },

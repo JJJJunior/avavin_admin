@@ -7,6 +7,7 @@ import axios from "axios";
 import {Button} from "@/components/ui/button";
 import {UploadIcon} from "lucide-react";
 import toast from "react-hot-toast";
+import {element} from "prop-types";
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
@@ -23,7 +24,12 @@ type SavedUrl = {
     imageUrl: string | null
 }
 
-const AvaImageServerUpload = () => {
+
+interface AvaImageServerUploadProps {
+    onUpload: (value: string) => void
+}
+
+const AvaImageServerUpload: React.FC<AvaImageServerUploadProps> = ({onUpload}) => {
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -37,14 +43,19 @@ const AvaImageServerUpload = () => {
             ...item,
             savedUrl,
         }))
-        console.log(newData)
-        try {
-            const res = await axios.post("/api/images", newData)
-            if (res.status === 200) {
-                toast.success("Image saved success!")
+        if (newData) {
+            try {
+                const res = await axios.post("/api/images", newData)
+                if (res.status === 200) {
+                    // toast.success("Image saved success!")
+                }
+            } catch (err) {
+                console.log("[handleClickOk]", err)
+            } finally {
+                setFileList([])
             }
-        } catch (err) {
-            console.log("[handleClickOk]", err)
+        } else {
+            console.log("newData is null")
         }
     }
     const handleClickCancel = () => {
@@ -86,6 +97,8 @@ const AvaImageServerUpload = () => {
             .then(res => {
                 onSuccess(file);
                 console.log(res);
+                //将上传图片服务器返回的url传递给控件
+                onUpload(res.data.data.image_url);
                 setSavedUrl({
                     imageSaveUrl: res.data.data.image_save_url,
                     imageUrl: res.data.data.image_url,
@@ -99,7 +112,7 @@ const AvaImageServerUpload = () => {
     return (
         <div>
             {showUpload && (
-                <div className="relative top-20 border rounded-xl shadow-lg">
+                <div className="relative top-20 z-10 border bg-grey-1 text-white rounded-xl shadow-lg">
                     <div className="flex flex-col h-80 p-4 justify-between">
                         <div className="flex flex-col gap-9">
                             <Upload
