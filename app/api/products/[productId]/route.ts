@@ -58,7 +58,14 @@ export const GET = async (req: NextRequest, { params }: { params: { productId: s
     if (!product) {
       return new NextResponse(JSON.stringify({ message: "Product not found" }), { status: 404 });
     }
-    return NextResponse.json(product, { status: 200 });
+    return NextResponse.json(product, {
+      status: 200,
+      headers: {
+        "Access-Control-Allow-Origin": `${process.env.ECOMMERCE_STORE_URL}`,
+        "Access-Control-Allow-Methods": "GET",
+        "Access-Control-Allow-Headers": "Content-Type",
+      },
+    });
   } catch (err) {
     console.log(err);
     return new NextResponse("Internal Server Error", { status: 500 });
