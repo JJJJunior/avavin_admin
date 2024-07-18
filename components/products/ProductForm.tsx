@@ -266,7 +266,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
                     <MultiText
                       placeholder="Tags"
                       value={field.value}
-                      onChange={(tag) => field.onChange([...field.value, tag])}
+                      onChange={(tag) => field.onChange([...field.value, tag.trim()])}
                       onRemove={(tagToRemove) => field.onChange([...field.value.filter((tag) => tag !== tagToRemove)])}
                     />
                   </FormControl>
@@ -307,7 +307,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
                     <MultiText
                       placeholder="Colors"
                       value={field.value}
-                      onChange={(color) => field.onChange([...field.value, color])}
+                      onChange={(color) => field.onChange([...field.value, color.trim()])}
                       onRemove={(colorToRemove) =>
                         field.onChange([...field.value.filter((color) => color !== colorToRemove)])
                       }
@@ -327,7 +327,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
                     <MultiText
                       placeholder="Sizes"
                       value={field.value}
-                      onChange={(size) => field.onChange([...field.value, size])}
+                      onChange={(size) => field.onChange([...field.value, size.trim()])}
                       onRemove={(sizeToRemove) =>
                         field.onChange([...field.value.filter((size) => size !== sizeToRemove)])
                       }
