@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import {NextRequest, NextResponse} from "next/server";
+import {auth} from "@clerk/nextjs/server";
 import prisma from "@/prisma";
 
-export const DELETE = async (req: NextRequest, { params }: { params: { productId: string } }) => {
+export const DELETE = async (req: NextRequest, {params}: { params: { productId: string } }) => {
   try {
-    const { userId } = auth();
+    const {userId} = auth();
     if (!userId) {
-      return new NextResponse("Unauthorized!", { status: 403 });
+      return new NextResponse("Unauthorized!", {status: 403});
     }
 
     //查出产品以及关联关系
@@ -20,7 +20,7 @@ export const DELETE = async (req: NextRequest, { params }: { params: { productId
     });
 
     if (!product) {
-      return new NextResponse("Product not found", { status: 404 });
+      return new NextResponse("Product not found", {status: 404});
     }
 
     // 清空全部的关联关系
@@ -38,14 +38,14 @@ export const DELETE = async (req: NextRequest, { params }: { params: { productId
       },
     });
 
-    return new NextResponse("Collection is deleted!", { status: 200 });
+    return new NextResponse("Collection is deleted!", {status: 200});
   } catch (err) {
     console.log("[product_Id_DELETE]", err);
-    return new NextResponse("Internal Server Error", { status: 500 });
+    return new NextResponse("Internal Server Error", {status: 500});
   }
 };
 
-export const GET = async (req: NextRequest, { params }: { params: { productId: string } }) => {
+export const GET = async (req: NextRequest, {params}: { params: { productId: string } }) => {
   try {
     const product = await prisma.product.findUnique({
       where: {
@@ -56,7 +56,7 @@ export const GET = async (req: NextRequest, { params }: { params: { productId: s
       },
     });
     if (!product) {
-      return new NextResponse(JSON.stringify({ message: "Product not found" }), { status: 404 });
+      return new NextResponse(JSON.stringify({message: "Product not found"}), {status: 404});
     }
     return NextResponse.json(product, {
       status: 200,
@@ -68,21 +68,33 @@ export const GET = async (req: NextRequest, { params }: { params: { productId: s
     });
   } catch (err) {
     console.log(err);
-    return new NextResponse("Internal Server Error", { status: 500 });
+    return new NextResponse("Internal Server Error", {status: 500});
   }
 };
 
-export const POST = async (req: NextRequest, { params }: { params: { productId: string } }) => {
+export const POST = async (req: NextRequest, {params}: { params: { productId: string } }) => {
   try {
-    const { userId } = auth();
+    const {userId} = auth();
     if (!userId) {
-      return new NextResponse("Unauthorized!", { status: 404 });
+      return new NextResponse("Unauthorized!", {status: 404});
     }
 
-    const { productId } = params;
+    const {productId} = params;
 
     // 解析请求的 JSON 数据
-    const { title, description, media, category, collections, tags, sizes, colors, price, expense } = await req.json();
+    const {
+      title,
+      description,
+      media,
+      category,
+      collections,
+      tags,
+      status,
+      sizes,
+      colors,
+      price,
+      expense
+    } = await req.json();
 
     if (!title || !description || !media || !category || !price || !expense || media.length === 0) {
       return new NextResponse("Not enough data to create a new product!", {
@@ -92,12 +104,12 @@ export const POST = async (req: NextRequest, { params }: { params: { productId: 
 
     // 查找现有产品,主要作用是查出产品目前关联的栏目数据
     const product = await prisma.product.findUnique({
-      where: { id: productId },
-      include: { collections: true },
+      where: {id: productId},
+      include: {collections: true},
     });
 
     if (!product) {
-      return new NextResponse("Product not found", { status: 404 });
+      return new NextResponse("Product not found", {status: 404});
     }
 
     // 清空全部的关联关系
@@ -110,7 +122,7 @@ export const POST = async (req: NextRequest, { params }: { params: { productId: 
     }
     //更新数据，创建关联关系
     const updatedProduct = await prisma.product.update({
-      where: { id: productId },
+      where: {id: productId},
       data: {
         title,
         description,
@@ -126,6 +138,7 @@ export const POST = async (req: NextRequest, { params }: { params: { productId: 
           })),
         },
         tags,
+        status,
         sizes,
         colors,
         price,
@@ -133,9 +146,9 @@ export const POST = async (req: NextRequest, { params }: { params: { productId: 
       },
     });
 
-    return NextResponse.json(updatedProduct, { status: 200 });
+    return NextResponse.json(updatedProduct, {status: 200});
   } catch (err) {
     console.log(err);
-    return new NextResponse("Internal Server Error", { status: 500 });
+    return new NextResponse("Internal Server Error", {status: 500});
   }
 };

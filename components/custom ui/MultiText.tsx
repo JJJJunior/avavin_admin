@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { X } from "lucide-react";
+import {Input} from "@/components/ui/input";
+import {Badge} from "@/components/ui/badge";
+import {X} from "lucide-react";
 
 interface MultiTextProps {
   placeholder: string;
@@ -11,7 +11,7 @@ interface MultiTextProps {
   onRemove: (value: string) => void;
 }
 
-const MultiText: React.FC<MultiTextProps> = ({ placeholder, value, onChange, onRemove }) => {
+const MultiText: React.FC<MultiTextProps> = ({placeholder, value, onChange, onRemove}) => {
   const [inputValue, setInputValue] = React.useState("");
   const addValue = (item: string) => {
     onChange(item);
@@ -37,14 +37,14 @@ const MultiText: React.FC<MultiTextProps> = ({ placeholder, value, onChange, onR
         }}
       />
       <div className="flex gap-1 flex-wrap mt-4 overflow-visible">
-        {value.map((item, index) => (
+        {value.length > 0 && value.map((item, index) => (
           <Badge key={index} className="bg-grey-1 text-white">
             {item}
             <button
               className="ml-1 rounded-full outline-none hover:bg-red-1"
               onClick={(evt) => handleClickBtn(evt, item)}
             >
-              <X className="h-3 w-3" />
+              <X className="h-3 w-3"/>
             </button>
           </Badge>
         ))}

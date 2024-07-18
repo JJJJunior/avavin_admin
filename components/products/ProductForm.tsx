@@ -1,22 +1,29 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { Separator } from "@/components/ui/separator";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import React, {useEffect, useState} from "react";
+import {Separator} from "@/components/ui/separator";
+import {z} from "zod";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {useForm} from "react-hook-form";
+import {Button} from "@/components/ui/button";
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+import {Input} from "@/components/ui/input";
+import {Textarea} from "@/components/ui/textarea";
 import ImageUpload from "@/components/custom ui/ImageUpload";
-import { useRouter } from "next/navigation";
+import {useRouter} from "next/navigation";
 import toast from "react-hot-toast";
 import axios from "axios";
 import Delete from "@/components/custom ui/Delete";
 import MultiText from "@/components/custom ui/MultiText";
 import MultiSelect from "@/components/custom ui/MultiSelect";
-import { CollectionType, ProductType } from "@/lib/types";
+import {CollectionType, ProductType} from "@/lib/types";
 import Loader from "@/components/custom ui/Loader";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 const formSchema = z.object({
   title: z.string().min(2).max(100),
@@ -31,6 +38,7 @@ const formSchema = z.object({
     }),
   category: z.string().min(2).max(20),
   collections: z.array(z.string()),
+  status: z.string(),
   tags: z.array(z.string()),
   sizes: z.array(z.string()),
   colors: z.array(z.string()),
@@ -48,33 +56,36 @@ const handleKeyPress = (evt: React.KeyboardEvent<HTMLInputElement> | React.Keybo
   }
 };
 
-interface ExistingDataType {
-  id: string;
-  title: string;
-  description: string;
-  media: string[];
-  category: string;
-  collections: string[];
-  tags: string[];
-  sizes: string[];
-  colors: string[];
-  price: number;
-  expense: number;
-}
-
-const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
+const ProductForm: React.FC<ProductFormProps> = ({initialData}) => {
   //处理initialData 切换成mysql数据库后，media、tags、sizes、colors 都是数组转成字符串保存数据库,collections是对象，转成id
 
-  let existingData: ExistingDataType;
+  let existingData: {
+    productId?: string;
+    orderId?: string;
+    description: string;
+    media: string[];
+    title: string;
+    status: string;
+    expense: number;
+    colors: string[];
+    tags: string[];
+    createdAt: Date;
+    sizes: string[];
+    collections: any;
+    price: number;
+    id: string;
+    category: string;
+    updatedAt: Date
+  };
 
   if (initialData) {
     existingData = {
       ...initialData,
       media: initialData.media.split(","),
       collections: initialData.collections.map((item) => item.collectionId),
-      tags: initialData.tags.split(","),
-      sizes: initialData.sizes.split(","),
-      colors: initialData.colors.split(","),
+      tags: initialData.tags.split(",").filter(item => item !== ""),
+      sizes: initialData.sizes.split(",").filter(item => item !== ""),
+      colors: initialData.colors.split(",").filter(item => item !== "")
     };
   }
 
@@ -84,17 +95,18 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
     defaultValues: existingData
       ? existingData
       : {
-          title: "",
-          description: "",
-          media: [],
-          category: "",
-          collections: [],
-          tags: [],
-          sizes: [],
-          colors: [],
-          price: 0.1,
-          expense: 0.1,
-        },
+        title: "",
+        description: "",
+        media: [],
+        category: "",
+        status: "",
+        collections: [],
+        tags: [],
+        sizes: [],
+        colors: [],
+        price: 0.1,
+        expense: 0.1,
+      },
   });
 
   // console.log(initialData);
@@ -159,50 +171,75 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
   };
 
   return loading ? (
-    <Loader />
+    <Loader/>
   ) : (
     <div className="p-10">
       {existingData ? (
         <div className="flex items-center justify-between">
           <p className="text-heading2-bold">Edit Product</p>
-          <Delete id={existingData.id} item={"product"} />
+          <Delete id={existingData.id} item={"product"}/>
         </div>
       ) : (
         <p className="text-heading2-bold">Create Product</p>
       )}
-      <Separator className="bg-grey-1 mt-4 mb-7" />
+      <Separator className="bg-grey-1 mt-4 mb-7"/>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
             control={form.control}
             name="title"
-            render={({ field }) => (
+            render={({field}) => (
               <FormItem>
                 <FormLabel>Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="title" {...field} onKeyDown={handleKeyPress} />
+                  <Input placeholder="title" {...field} onKeyDown={handleKeyPress}/>
                 </FormControl>
-                <FormMessage className="text-red-1" />
+                <FormMessage className="text-red-1"/>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="status"
+            render={({field}) => (
+              <FormItem>
+                <FormLabel>Status</FormLabel>
+                <FormControl>
+                  <Select
+                    {...field}
+                    onValueChange={(status) => field.onChange(status)}
+                    value={field.value}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Status"/>
+                    </SelectTrigger>
+                    <SelectContent className="bg-grey-1 text-white">
+                      <SelectItem value="published" className="cursor-pointer">Published</SelectItem>
+                      <SelectItem value="draft" className="cursor-pointer">Draft</SelectItem>
+                      <SelectItem value="archived" className="cursor-pointer">Archived</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage className="text-red-1"/>
               </FormItem>
             )}
           />
           <FormField
             control={form.control}
             name="description"
-            render={({ field }) => (
+            render={({field}) => (
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="description" {...field} rows={5} onKeyDown={handleKeyPress} />
+                  <Textarea placeholder="description" {...field} rows={5} onKeyDown={handleKeyPress}/>
                 </FormControl>
-                <FormMessage className="text-red-1" />
+                <FormMessage className="text-red-1"/>
               </FormItem>
             )}
           />
           <FormField
             control={form.control}
             name="media"
-            render={({ field }) => (
+            render={({field}) => (
               <FormItem>
                 <FormLabel>Image</FormLabel>
                 <FormControl>
@@ -212,7 +249,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
                     onRemove={(url) => field.onChange([...field.value.filter((image) => image !== url)])}
                   />
                 </FormControl>
-                <FormMessage className="text-red-1" />
+                <FormMessage className="text-red-1"/>
               </FormItem>
             )}
           />
@@ -220,46 +257,46 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
             <FormField
               control={form.control}
               name="price"
-              render={({ field }) => (
+              render={({field}) => (
                 <FormItem>
                   <FormLabel>Price ($)</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="Price" {...field} onKeyDown={handleKeyPress} />
+                    <Input type="number" placeholder="Price" {...field} onKeyDown={handleKeyPress}/>
                   </FormControl>
-                  <FormMessage className="text-red-1" />
+                  <FormMessage className="text-red-1"/>
                 </FormItem>
               )}
             />
             <FormField
               control={form.control}
               name="expense"
-              render={({ field }) => (
+              render={({field}) => (
                 <FormItem>
                   <FormLabel>Expense ($)</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="Expense" {...field} onKeyDown={handleKeyPress} />
+                    <Input type="number" placeholder="Expense" {...field} onKeyDown={handleKeyPress}/>
                   </FormControl>
-                  <FormMessage className="text-red-1" />
+                  <FormMessage className="text-red-1"/>
                 </FormItem>
               )}
             />
             <FormField
               control={form.control}
               name="category"
-              render={({ field }) => (
+              render={({field}) => (
                 <FormItem>
                   <FormLabel>Category</FormLabel>
                   <FormControl>
-                    <Input placeholder="Category" {...field} onKeyDown={handleKeyPress} />
+                    <Input placeholder="Category" {...field} onKeyDown={handleKeyPress}/>
                   </FormControl>
-                  <FormMessage className="text-red-1" />
+                  <FormMessage className="text-red-1"/>
                 </FormItem>
               )}
             />
             <FormField
               control={form.control}
               name="tags"
-              render={({ field }) => (
+              render={({field}) => (
                 <FormItem>
                   <FormLabel>Tags</FormLabel>
                   <FormControl>
@@ -270,7 +307,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
                       onRemove={(tagToRemove) => field.onChange([...field.value.filter((tag) => tag !== tagToRemove)])}
                     />
                   </FormControl>
-                  <FormMessage className="text-red-1" />
+                  <FormMessage className="text-red-1"/>
                 </FormItem>
               )}
             />
@@ -278,7 +315,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
               <FormField
                 control={form.control}
                 name="collections"
-                render={({ field }) => (
+                render={({field}) => (
                   <FormItem>
                     <FormLabel>Collections</FormLabel>
                     <FormControl>
@@ -292,7 +329,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
                         }
                       />
                     </FormControl>
-                    <FormMessage className="text-red-1" />
+                    <FormMessage className="text-red-1"/>
                   </FormItem>
                 )}
               />
@@ -300,7 +337,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
             <FormField
               control={form.control}
               name="colors"
-              render={({ field }) => (
+              render={({field}) => (
                 <FormItem>
                   <FormLabel>Colors</FormLabel>
                   <FormControl>
@@ -313,14 +350,14 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
                       }
                     />
                   </FormControl>
-                  <FormMessage className="text-red-1" />
+                  <FormMessage className="text-red-1"/>
                 </FormItem>
               )}
             />
             <FormField
               control={form.control}
               name="sizes"
-              render={({ field }) => (
+              render={({field}) => (
                 <FormItem>
                   <FormLabel>Sizes</FormLabel>
                   <FormControl>
@@ -333,7 +370,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
                       }
                     />
                   </FormControl>
-                  <FormMessage className="text-red-1" />
+                  <FormMessage className="text-red-1"/>
                 </FormItem>
               )}
             />
