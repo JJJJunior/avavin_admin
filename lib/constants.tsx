@@ -1,29 +1,29 @@
-import { LayoutDashboard, Settings, Shapes, ShoppingBag, Tag } from "lucide-react";
+import {LayoutDashboard, Shapes, ShoppingBag, Tag, Users} from "lucide-react";
 
 export const navLinks = [
   {
     url: "/dashboard",
-    icon: <LayoutDashboard />,
+    icon: <LayoutDashboard/>,
     label: "Dashboard",
   },
   {
     url: "/dashboard/collections",
-    icon: <Shapes />,
+    icon: <Shapes/>,
     label: "Collections",
   },
   {
     url: "/dashboard/products",
-    icon: <Tag />,
+    icon: <Tag/>,
     label: "Products",
   },
   {
     url: "/dashboard/orders",
-    icon: <ShoppingBag />,
+    icon: <ShoppingBag/>,
     label: "Orders",
   },
   {
-    url: "/dashboard/settings",
-    icon: <Settings />,
-    label: "Settings",
+    url: "/dashboard/customers",
+    icon: <Users/>,
+    label: "Customers",
   },
 ];
