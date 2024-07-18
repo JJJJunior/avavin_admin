@@ -8,7 +8,7 @@ export const GET = async (req: NextRequest, { params }: { params: { productId: s
         id: params.productId,
       },
     });
-    const relations = await prisma.product.findMany({
+    const relatedProducts = await prisma.product.findMany({
       where: {
         OR: [
           {
@@ -17,9 +17,11 @@ export const GET = async (req: NextRequest, { params }: { params: { productId: s
         ],
       },
     });
-
+    if (!relatedProducts) {
+      return new NextResponse("No related products found", { status: 404 }); // ���有找到相关的category下的产品
+    }
     // 推荐相关的category下的产品
-    return NextResponse.json(relations, { status: 200 });
+    return NextResponse.json(relatedProducts, { status: 200 });
   } catch (err) {
     console.error("[related_GET]", err);
     return new NextResponse("Internal Server Error", { status: 500 });
