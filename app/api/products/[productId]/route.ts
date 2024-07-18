@@ -125,6 +125,7 @@ export const POST = async (req: NextRequest, { params }: { params: { productId: 
             },
           })),
         },
+        tags,
         sizes,
         colors,
         price,
