@@ -127,6 +127,7 @@ model Collection {
   createdAt   DateTime                @default(now())
   updatedAt   DateTime                @default(now())
   products    ProductsOnCollections[]
+  status      String?
 }
 
 model Product {
@@ -144,6 +145,7 @@ model Product {
   updatedAt   DateTime                @default(now())
   collections ProductsOnCollections[]
   orders      ProductsOnOder[]
+  status      String?
 }
 
 model ProductsOnCollections {
